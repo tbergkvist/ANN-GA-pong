@@ -1,10 +1,12 @@
 import numpy as np
 
+
 class ANN:
     def __init__(self, input_size, hidden_layer_sizes, output_size):
         # Initialize the network structure
         self.layers = []
         self.biases = []
+        self.random_number = np.random.random()
 
         # Create the weight arrays and biases for each layer
         layer_sizes = [input_size] + hidden_layer_sizes + [output_size]
@@ -29,5 +31,8 @@ class ANN:
         output = self.forward(input_data)
         # Convert the output to an integer between -1 and 1
         move = np.clip(output[0], -1, 1)
-        move *= 5
+        move *= mult
         return move
+
+    def __lt__(self, other):
+        return self.random_number < other.random_number

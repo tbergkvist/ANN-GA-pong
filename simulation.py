@@ -31,10 +31,12 @@ class Ball:
         if self.y <= 0 or self.y >= HEIGHT - BALL_SIZE:
             self.vy = -self.vy
 
+
 # Paddle class
 class Paddle:
-    def __init__(self, x, nn=None):
+    def __init__(self, x, name, nn=None):
         self.nn = nn
+        self.name = name
         self.x = x
         self.y = HEIGHT // 2 - PADDLE_HEIGHT // 2
         self.vy = 0
@@ -43,12 +45,13 @@ class Paddle:
         self.y += self.vy
         self.y = max(min(self.y, HEIGHT - PADDLE_HEIGHT), 0)
 
+
 # Game class
 class Game:
     def __init__(self, nn=[None, None]):
         self.ball = Ball()
-        self.paddle1 = Paddle(30, nn[0])
-        self.paddle2 = Paddle(WIDTH - 30 - PADDLE_WIDTH, nn=nn[1])
+        self.paddle1 = Paddle(30, "Player 1", nn[0])
+        self.paddle2 = Paddle(WIDTH - 30 - PADDLE_WIDTH, "Player 2", nn=nn[1])
         self.winner = None
 
     def step(self, action1, action2):
@@ -60,18 +63,25 @@ class Game:
         self.ball.move()
 
         # Collision with paddles
-        if self.paddle1.x < self.ball.x < self.paddle1.x + PADDLE_WIDTH and self.paddle1.y < self.ball.y < self.paddle1.y + PADDLE_HEIGHT:
+        if (
+            self.paddle1.x < self.ball.x < self.paddle1.x + PADDLE_WIDTH
+            and self.paddle1.y < self.ball.y < self.paddle1.y + PADDLE_HEIGHT
+        ):
             self.ball.vx = -self.ball.vx
-        if self.paddle2.x < self.ball.x + BALL_SIZE < self.paddle2.x + PADDLE_WIDTH and self.paddle2.y < self.ball.y < self.paddle2.y + PADDLE_HEIGHT:
+        if (
+            self.paddle2.x < self.ball.x + BALL_SIZE < self.paddle2.x + PADDLE_WIDTH
+            and self.paddle2.y < self.ball.y < self.paddle2.y + PADDLE_HEIGHT
+        ):
             self.ball.vx = -self.ball.vx
 
         # Check for ball going out of bounds
         if self.ball.x <= 0:
-            self.winner = "Player 2"
+            self.winner = self.paddle2
         elif self.ball.x >= WIDTH - BALL_SIZE:
-            self.winner = "Player 1"
+            self.winner = self.paddle1
 
         return self.winner
+
 
 # Neural network action function
 def get_action(ball, paddle, opponent):
@@ -81,6 +91,7 @@ def get_action(ball, paddle, opponent):
     else:
         action = paddle.nn.predict(state)
     return action
+
 
 # Pygame display function
 def run_pygame(game):
@@ -98,18 +109,25 @@ def run_pygame(game):
 
         winner = game.step(action1, action2)
         if winner:
-            print(f"{winner} wins!")
+            print(f"{winner.name} wins!")
             running = False
 
         screen.fill(BLACK)
-        pygame.draw.rect(screen, WHITE, (game.paddle1.x, game.paddle1.y, PADDLE_WIDTH, PADDLE_HEIGHT))
-        pygame.draw.rect(screen, WHITE, (game.paddle2.x, game.paddle2.y, PADDLE_WIDTH, PADDLE_HEIGHT))
-        pygame.draw.rect(screen, WHITE, (game.ball.x, game.ball.y, BALL_SIZE, BALL_SIZE))
+        pygame.draw.rect(
+            screen, WHITE, (game.paddle1.x, game.paddle1.y, PADDLE_WIDTH, PADDLE_HEIGHT)
+        )
+        pygame.draw.rect(
+            screen, WHITE, (game.paddle2.x, game.paddle2.y, PADDLE_WIDTH, PADDLE_HEIGHT)
+        )
+        pygame.draw.rect(
+            screen, WHITE, (game.ball.x, game.ball.y, BALL_SIZE, BALL_SIZE)
+        )
 
         pygame.display.flip()
         clock.tick(FPS)
 
     pygame.quit()
+
 
 # Headless simulation function
 def run_headless(game, verbose=False):
@@ -119,5 +137,5 @@ def run_headless(game, verbose=False):
         action2 = get_action(game.ball, game.paddle2, game.paddle1)
         winner = game.step(action1, action2)
     if verbose:
-        print(f"Player {winner} wins!")
+        print(f"Player {winner.name} wins!")
     return winner
