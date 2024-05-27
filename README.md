@@ -1,7 +1,5 @@
-# EXTG15 Final Project
-By Teo Bergkvist $\pi 3$
-
-Spring 2024
+# Artificial Neural Networks trained by a Genetic Algorithm to play... Pong?!
+Created by Teo Bergkvist $\pi 3$, as a final project in the course EXTG15 at Lund University.
 
 I made this project to demonstrate a cool use case of ANNs (Artificial Neural Networks) and Genetic Algorithms. 
 
