@@ -10,7 +10,7 @@ I made this project to demonstrate a cool use case of ANNs (Artificial Neural Ne
 - If everything goes well, the program should now be set-up.
 
 ## Usage
-- Open the ipython notebook `main.ipynb` with vs-code, jupyter notebook or some wherever you usually code.
+- Open the ipython notebook `main.ipynb` with vs-code, jupyter notebook or wherever you usually code.
 - The notebook is well commented and needs no more explanation.
 
 ## Note
