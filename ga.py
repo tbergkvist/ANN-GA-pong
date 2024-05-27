@@ -1,6 +1,7 @@
+# Created by Teo Bergkvist as a final project in the course EXTG15 at Lund University 2024.
+
 import numpy as np
 from ann import ANN
-from simulation import Game
 
 
 def mutate(ann, mutation_rate=0.01):
@@ -43,23 +44,11 @@ def crossover(parent1, parent2):
     return child
 
 
-def create_game_matrix(players):
-    number_of_players = len(players)
-    game_matrix = np.empty((number_of_players, number_of_players), dtype=Game)
-    for row in range(number_of_players):
-        for col in range(number_of_players):
-            if row == col:
-                continue
-            if game_matrix[col][row] is None:
-                nn = [players[row][1], players[col][1]]
-                game_matrix[row][col] = Game(nn)
-    return game_matrix
-
-
 def update_fitness(players, winner_matrix):
     for i, row in enumerate(winner_matrix):
         players[i] = (sum(row), players[i][1])
-    return players.sort()
+    players.sort(reverse=True, key=lambda x: x[0])  # Sort players by their fitness
+    return players
 
 
 def multiply(players, ratio_survivors=0.5, mutation_rate=0.01):

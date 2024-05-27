@@ -1,3 +1,5 @@
+# Created by Teo Bergkvist as a final project in the course EXTG15 at Lund University 2024.
+
 import pygame
 import random
 import threading
@@ -139,3 +141,16 @@ def run_headless(game, verbose=False):
     if verbose:
         print(f"Player {winner.name} wins!")
     return winner
+
+
+def create_game_matrix(players):
+    number_of_players = len(players)
+    game_matrix = np.empty((number_of_players, number_of_players), dtype=Game)
+    for row in range(number_of_players):
+        for col in range(number_of_players):
+            if row == col:
+                continue
+            if game_matrix[col][row] is None:
+                nn = [players[row][1], players[col][1]]
+                game_matrix[row][col] = Game(nn)
+    return game_matrix
