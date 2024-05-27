@@ -23,10 +23,11 @@ class ANN:
             x = self.sigmoid(np.dot(x, weight_matrix) + bias_vector)
         return x
 
-    def predict(self, state):
+    def predict(self, state, mult=5):
         # State is a list [ball_x, ball_y, paddle_y, opponent_y]
         input_data = np.array(state)
         output = self.forward(input_data)
         # Convert the output to an integer between -1 and 1
         move = np.clip(output[0], -1, 1)
+        move *= 5
         return move

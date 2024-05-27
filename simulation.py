@@ -76,10 +76,10 @@ class Game:
 # Neural network action function
 def get_action(ball, paddle, opponent):
     state = np.array([ball.x, ball.y, paddle.y, opponent.y])
-    if ball.nn is None:
+    if paddle.nn is None:
         action = random.choice([-5, 0, 5])
     else:
-        action = ball.nn.predict(state[0], )
+        action = paddle.nn.predict(state)
     return action
 
 # Pygame display function
@@ -113,9 +113,11 @@ def run_pygame(game):
 
 # Headless simulation function
 def run_headless(game, verbose=False):
+    winner = None
     while not game.winner:
         action1 = get_action(game.ball, game.paddle1, game.paddle2)
         action2 = get_action(game.ball, game.paddle2, game.paddle1)
         winner = game.step(action1, action2)
     if verbose:
         print(f"Player {winner} wins!")
+    return winner
