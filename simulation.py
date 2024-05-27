@@ -11,15 +11,13 @@ PADDLE_WIDTH, PADDLE_HEIGHT = 10, 100
 BALL_SIZE = 10
 FPS = 60
 
-# Initialize pygame
-pygame.init()
-
 # Colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 # Ball class
 class Ball:
+    """Class for the pong ball object."""
     def __init__(self):
         self.x = WIDTH // 2
         self.y = HEIGHT // 2
@@ -27,6 +25,7 @@ class Ball:
         self.vy = random.choice([-2, 2])
 
     def move(self):
+        """Moves the ball in according to its velocity."""
         self.x += self.vx
         self.y += self.vy
 
@@ -36,6 +35,7 @@ class Ball:
 
 # Paddle class
 class Paddle:
+    """Class for the pong paddle object."""
     def __init__(self, x, name, nn=None):
         self.nn = nn
         self.name = name
@@ -44,19 +44,35 @@ class Paddle:
         self.vy = 0
 
     def move(self):
+        """Moves according to its velocity."""
         self.y += self.vy
         self.y = max(min(self.y, HEIGHT - PADDLE_HEIGHT), 0)
 
 
 # Game class
 class Game:
+    """Class for the game object."""
     def __init__(self, nn=[None, None]):
+        """Initializes a game object.
+
+        Args:
+            nn (list): The neural network objects for the two players. Defaults to [None, None].
+        """
         self.ball = Ball()
         self.paddle1 = Paddle(30, "Player 1", nn[0])
         self.paddle2 = Paddle(WIDTH - 30 - PADDLE_WIDTH, "Player 2", nn=nn[1])
         self.winner = None
 
     def step(self, action1, action2):
+        """Function that lets each paddle take a step.
+
+        Args:
+            action1 (float): Value from the action funtion.
+            action2 (float): Value from the action funtion.
+
+        Returns:
+            paddle object: The paddle that won.
+        """
         self.paddle1.vy = action1
         self.paddle2.vy = action2
 
@@ -87,6 +103,16 @@ class Game:
 
 # Neural network action function
 def get_action(ball, paddle, opponent):
+    """Function to calculate an action with the neural nets.
+
+    Args:
+        ball (ball object): Needed for its coordinates.
+        paddle (paddle object): The paddle object with its neural network.
+        opponent (paddle object): The opponents paddle object, needed for its coordinates.
+
+    Returns:
+        float: The direction to move.
+    """
     state = np.array([ball.x, ball.y, paddle.y, opponent.y])
     if paddle.nn is None:
         action = random.choice([-5, 0, 5])
@@ -95,8 +121,31 @@ def get_action(ball, paddle, opponent):
     return action
 
 
-# Pygame display function
+def create_game_matrix(players):
+    """A function to create the matrix containing all possible game combinations.
+
+    Args:
+        players (list): List of all players.
+
+    Returns:
+        _type_: A nxn array, with all possible game combinations.
+    """
+    number_of_players = len(players)
+    game_matrix = np.empty((number_of_players, number_of_players), dtype=Game)
+    for row in range(number_of_players):
+        for col in range(number_of_players):
+            if row == col:
+                continue
+            if game_matrix[col][row] is None:
+                nn = [players[row][1], players[col][1]]
+                game_matrix[row][col] = Game(nn)
+    return game_matrix
+
+
+# GUI Simulation.
 def run_pygame(game):
+    pygame.init()
+
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     clock = pygame.time.Clock()
 
@@ -141,16 +190,3 @@ def run_headless(game, verbose=False):
     if verbose:
         print(f"Player {winner.name} wins!")
     return winner
-
-
-def create_game_matrix(players):
-    number_of_players = len(players)
-    game_matrix = np.empty((number_of_players, number_of_players), dtype=Game)
-    for row in range(number_of_players):
-        for col in range(number_of_players):
-            if row == col:
-                continue
-            if game_matrix[col][row] is None:
-                nn = [players[row][1], players[col][1]]
-                game_matrix[row][col] = Game(nn)
-    return game_matrix
