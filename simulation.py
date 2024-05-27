@@ -4,6 +4,7 @@ import pygame
 import random
 import numpy as np
 
+
 # Constants
 WIDTH, HEIGHT = 640, 480
 PADDLE_WIDTH, PADDLE_HEIGHT = 10, 100

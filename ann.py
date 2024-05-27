@@ -1,4 +1,5 @@
 # Created by Teo Bergkvist as a final project in the course EXTG15 at Lund University 2024.
+
 import numpy as np
 import json
 
