@@ -44,7 +44,6 @@ def run_games(game_matrix):
     return winner_matrix, max_playtime
 
 
-gpu = False
 input_size = 4  # ball_x, ball_y, paddle_y, opponent_y, do not change this if you do not know what you are doing!!
 hidden_layer_sizes = [5, 5]  # Two hidden layers with 10 neurons each.
 output_size = 1  # Single output neuron for the paddle movement.
@@ -56,27 +55,33 @@ playtimes = []
 prev_players = 4
 
 for i in range(number_of_players):  # Create all players.
-    players.append((0, ANN(input_size, hidden_layer_sizes, output_size, gpu=gpu)))  # Tuples with their score and their ANN.
+    players.append((0, ANN(input_size, hidden_layer_sizes, output_size)))  # Tuples with their score and their ANN.
     if i < prev_players:
         players[i][1].load(f"./save/ANN_player_{i}.json")
 
-try:
-    for i in range(number_of_generations):
-        print(f"Simulating generation: {i} out of {number_of_generations}. {round(i / number_of_generations, 4) * 100}%")
-        game_matrix = create_game_matrix(players)
-        winner_matrix, max_playtime = run_games(game_matrix)
-        update_fitness(players, winner_matrix)
-        players = multiply(players, mutation_rate=mutation_rate)
-        playtimes.append(max_playtime)
-except KeyboardInterrupt:
-    print("killing.")
 
-number_of_players_to_save = 4  # This sets the number of players to save to a file.
+def main(players):
+    try:
+        for i in range(number_of_generations):
+            print(f"Simulating generation: {i} out of {number_of_generations}. {round(i / number_of_generations, 4) * 100}%")
+            game_matrix = create_game_matrix(players)
+            winner_matrix, max_playtime = run_games(game_matrix)
+            update_fitness(players, winner_matrix)
+            players = multiply(players, mutation_rate=mutation_rate)
+            playtimes.append(max_playtime)
+    except KeyboardInterrupt:
+        print("killing.")
 
-for i in range(number_of_players_to_save):
-    players[i][1].save(f"./save/ANN_player_{i}.json")
+    number_of_players_to_save = 4  # This sets the number of players to save to a file.
 
-print(playtimes)
+    for i in range(number_of_players_to_save):
+        players[i][1].save(f"./save/ANN_player_{i}.json")
 
-with open("./save/playtimes.txt", "w") as f:
-    f.write(", ".join(map(str, playtimes)))
+    print(playtimes)
+
+    with open("./save/playtimes.txt", "w") as f:
+        f.write(", ".join(map(str, playtimes)))
+
+
+if __name__ == '__main__':
+    main(players)
