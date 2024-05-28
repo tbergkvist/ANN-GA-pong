@@ -5,7 +5,7 @@ import json
 
 
 class ANN:
-    def __init__(self, input_size, hidden_layer_sizes, output_size):
+    def __init__(self, input_size, hidden_layer_sizes, output_size, gpu=False):
         """Initializes a neural network object.
 
         Args:
@@ -16,6 +16,7 @@ class ANN:
         self.layers = []
         self.biases = []
         self.random_number = np.random.random()
+        self.gpu = gpu
 
         # Create the weight arrays and biases for each layer.
         layer_sizes = [input_size] + hidden_layer_sizes + [output_size]
@@ -24,6 +25,9 @@ class ANN:
             bias_vector = np.random.randn(layer_sizes[i + 1])
             self.layers.append(weight_matrix)
             self.biases.append(bias_vector)
+
+        if self.gpu:
+            import cupy as cp
 
     @staticmethod
     def sigmoid(x):
@@ -50,6 +54,25 @@ class ANN:
             x = np.dot(x, weight_matrix) + bias_vector
             x = self.sigmoid(x)
         return x
+    
+    def forward_gpu(self, x):
+        """Forward pass through the network using GPU acceleration with cupy.
+
+        Args:
+            x (array): Input values.
+
+        Returns:
+            int: Output value.
+        """
+        if not self.gpu:
+            cp = None
+        x = cp.array(x)  # Convert input to cupy array
+        for weight_matrix, bias_vector in zip(self.layers, self.biases):
+            weight_matrix_cp = cp.array(weight_matrix)  # Convert weights to cupy array
+            bias_vector_cp = cp.array(bias_vector)  # Convert biases to cupy array
+            x = cp.dot(x, weight_matrix_cp) + bias_vector_cp
+            x = self.sigmoid(x)
+        return cp.asnumpy(x)  # Convert result back to numpy array
 
     def predict(self, state, mult=5):
         """Use the forward method to process state values and output a direction value.
@@ -63,7 +86,10 @@ class ANN:
         """
         # State is a list [ball_x, ball_y, paddle_y, opponent_y].
         input_data = np.array(state)
-        output = self.forward(input_data)
+        if self.gpu:
+            output = self.forward_gpu(input_data)
+        else:
+            output = self.forward(input_data)
         # Convert the output to an integer between -1 and 1.
         move = np.clip(output[0], -1, 1)
         move *= mult

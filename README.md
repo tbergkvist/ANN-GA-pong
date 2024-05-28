@@ -9,6 +9,9 @@ I made this project to demonstrate a cool use case of ANNs (Artificial Neural Ne
 - Run `pip install -r requirements.txt` inside the repository directory.
 - If everything goes well, the program should now be set-up.
 
+#### GPU Setup
+- If `speed_trainer.py` is to be used with a GPU, then `pip install cupy` has to be run as well.
+
 ## Usage
 - Open the ipython notebook `main.ipynb` with vs-code, jupyter notebook or wherever you usually code.
 - The notebook is well commented and needs no more explanation.
