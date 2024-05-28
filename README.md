@@ -3,7 +3,7 @@ Created by Teo Bergkvist as a final project in the course EXTG15 at Lund Univers
 
 I made this project to demonstrate a cool use case of ANNs (Artificial Neural Networks) and Genetic Algorithms. 
 
-Result of 300 generation is shown below:
+Result of 300 generations is shown below:
 
 ![Demo](300_generations/pong.gif)
 
