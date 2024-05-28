@@ -16,6 +16,7 @@ class ANN:
         self.layers = []
         self.biases = []
         self.random_number = np.random.random()
+        self.predict_multiplier = 5
 
         # Create the weight arrays and biases for each layer.
         layer_sizes = [input_size] + hidden_layer_sizes + [output_size]
@@ -26,8 +27,8 @@ class ANN:
             self.biases.append(bias_vector)
 
     @staticmethod
-    def sigmoid(x):
-        """A modified sigmoid function. Pushes the x values to be in the range -1, 1.
+    def tanh(x):
+        """A tanh function. Pushes the x values to be in the range -1, 1.
 
         Args:
             x (int): Value to put into the function.
@@ -35,7 +36,7 @@ class ANN:
         Returns:
             int: Function output.
         """
-        return 2 / (1 + np.exp(-x)) - 1
+        return np.tanh(x / 2)
 
     def forward(self, x):
         """Forward pass through the network.
@@ -48,15 +49,14 @@ class ANN:
         """
         for weight_matrix, bias_vector in zip(self.layers, self.biases):
             x = np.dot(x, weight_matrix) + bias_vector
-            x = self.sigmoid(x)
+            x = self.tanh(x)
         return x
 
-    def predict(self, state, mult=5):
+    def predict(self, state):
         """Use the forward method to process state values and output a direction value.
 
         Args:
             state (array): Input values.
-            mult (int): Multiply to take steps of 5. Defaults to 5.
 
         Returns:
             int: Direction values.
@@ -66,7 +66,7 @@ class ANN:
         output = self.forward(input_data)
         # Convert the output to an integer between -1 and 1.
         move = np.clip(output[0], -1, 1)
-        move *= mult
+        move *= self.predict_multiplier
         return move
 
     def __lt__(self, other):

@@ -52,7 +52,7 @@ class Paddle:
 # Game class
 class Game:
     """Class for the game object."""
-    def __init__(self, nn=[None, None]):
+    def __init__(self, nn=[None, None], ball_speed_increase=1/20000):
         """Initializes a game object.
 
         Args:
@@ -62,6 +62,8 @@ class Game:
         self.paddle1 = Paddle(30, "Player 1", nn[0])
         self.paddle2 = Paddle(WIDTH - 30 - PADDLE_WIDTH, "Player 2", nn=nn[1])
         self.winner = None
+        self.playtime = 0
+        self.ball_speed_increase = ball_speed_increase
 
     def step(self, action1, action2):
         """Function that lets each paddle take a step.
@@ -79,18 +81,19 @@ class Game:
         self.paddle1.move()
         self.paddle2.move()
         self.ball.move()
+        self.playtime += 1
 
         # Collision with paddles
         if (
             self.paddle1.x < self.ball.x < self.paddle1.x + PADDLE_WIDTH
             and self.paddle1.y < self.ball.y < self.paddle1.y + PADDLE_HEIGHT
         ):
-            self.ball.vx = -self.ball.vx
+            self.ball.vx = -self.ball.vx + (self.ball_speed_increase * self.playtime)
         if (
             self.paddle2.x < self.ball.x + BALL_SIZE < self.paddle2.x + PADDLE_WIDTH
             and self.paddle2.y < self.ball.y < self.paddle2.y + PADDLE_HEIGHT
         ):
-            self.ball.vx = -self.ball.vx
+            self.ball.vx = -self.ball.vx + (self.ball_speed_increase * self.playtime)
 
         # Check for ball going out of bounds
         if self.ball.x <= 0:
