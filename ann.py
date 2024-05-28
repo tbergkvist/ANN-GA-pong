@@ -17,6 +17,8 @@ class ANN:
         self.biases = []
         self.random_number = np.random.random()
         self.gpu = gpu
+        self.cp = None
+        self.predict_multiplier = 5
 
         # Create the weight arrays and biases for each layer.
         layer_sizes = [input_size] + hidden_layer_sizes + [output_size]
@@ -28,10 +30,11 @@ class ANN:
 
         if self.gpu:
             import cupy as cp
+            self.cp = cp
 
     @staticmethod
-    def sigmoid(x):
-        """A modified sigmoid function. Pushes the x values to be in the range -1, 1.
+    def tanh(x):
+        """A tanh function. Pushes the x values to be in the range -1, 1.
 
         Args:
             x (int): Value to put into the function.
@@ -39,7 +42,7 @@ class ANN:
         Returns:
             int: Function output.
         """
-        return 2 / (1 + np.exp(-x)) - 1
+        return np.tanh(x / 2)
 
     def forward(self, x):
         """Forward pass through the network.
@@ -52,7 +55,7 @@ class ANN:
         """
         for weight_matrix, bias_vector in zip(self.layers, self.biases):
             x = np.dot(x, weight_matrix) + bias_vector
-            x = self.sigmoid(x)
+            x = self.tanh(x)
         return x
     
     def forward_gpu(self, x):
@@ -64,22 +67,19 @@ class ANN:
         Returns:
             int: Output value.
         """
-        if not self.gpu:
-            cp = None
-        x = cp.array(x)  # Convert input to cupy array
+        x = self.cp.array(x)  # Convert input to cupy array
         for weight_matrix, bias_vector in zip(self.layers, self.biases):
-            weight_matrix_cp = cp.array(weight_matrix)  # Convert weights to cupy array
-            bias_vector_cp = cp.array(bias_vector)  # Convert biases to cupy array
-            x = cp.dot(x, weight_matrix_cp) + bias_vector_cp
-            x = self.sigmoid(x)
-        return cp.asnumpy(x)  # Convert result back to numpy array
+            weight_matrix_cp = self.cp.array(weight_matrix)  # Convert weights to cupy array
+            bias_vector_cp = self.cp.array(bias_vector)  # Convert biases to cupy array
+            x = self.cp.dot(x, weight_matrix_cp) + bias_vector_cp
+            x = self.tanh(x)
+        return self.cp.asnumpy(x)  # Convert result back to numpy array
 
-    def predict(self, state, mult=5):
+    def predict(self, state):
         """Use the forward method to process state values and output a direction value.
 
         Args:
             state (array): Input values.
-            mult (int): Multiply to take steps of 5. Defaults to 5.
 
         Returns:
             int: Direction values.
@@ -92,7 +92,7 @@ class ANN:
             output = self.forward(input_data)
         # Convert the output to an integer between -1 and 1.
         move = np.clip(output[0], -1, 1)
-        move *= mult
+        move *= self.predict_multiplier
         return move
 
     def __lt__(self, other):
