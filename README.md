@@ -6,7 +6,7 @@ I made this project to demonstrate a cool use case of ANNs (Artificial Neural Ne
 ## Setup
 - Clone this repository or download the files manually.
 - Make sure to have python installed.
-- Run `pip install requirements.txt` inside the repository directory.
+- Run `pip install -r requirements.txt` inside the repository directory.
 - If everything goes well, the program should now be set-up.
 
 ## Usage
