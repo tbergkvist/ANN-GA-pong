@@ -45,14 +45,14 @@ def run_games(game_matrix):
 
 
 input_size = 4  # ball_x, ball_y, paddle_y, opponent_y, do not change this if you do not know what you are doing!!
-hidden_layer_sizes = [5, 5]  # Two hidden layers with 10 neurons each.
+hidden_layer_sizes = [6, 6]  # Two hidden layers with 10 neurons each.
 output_size = 1  # Single output neuron for the paddle movement.
-number_of_players = 20  # The number of players to have in each generation.
-number_of_generations = 50  # The number of generations to run.
-mutation_rate = 0.01
+number_of_players = 30  # The number of players to have in each generation.
+number_of_generations = 300  # The number of generations to run.
+mutation_rate = 0.1
 players = []
 playtimes = []
-prev_players = 4
+prev_players = 0  # Use this to start from pre-trained networks.
 
 for i in range(number_of_players):  # Create all players.
     players.append((0, ANN(input_size, hidden_layer_sizes, output_size)))  # Tuples with their score and their ANN.
